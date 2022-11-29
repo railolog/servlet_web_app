@@ -82,33 +82,45 @@
         <tr>
             <td>Выберите X:</td>
             <td>
-                <button class="x button inp" value="-5" type="button">-5</button>
-                <button class="x button inp" value="-4" type="button">-4</button>
-                <button class="x button inp" value="-3" type="button">-3</button>
-                <button class="x button inp" value="-2" type="button">-2</button>
-                <button class="x button inp" value="-1" type="button">-1</button>
-                <button class="x button inp" value="0" type="button">0</button>
-                <button class="x button inp" value="1" type="button">1</button>
-                <button class="x button inp" value="2" type="button">2</button>
-                <button class="x button inp" value="3" type="button">3</button>
+                <input class="x inp" type="text" placeholder="От -3 до 5" maxlength="6">
                 <span class="error x"></span>
             </td>
         </tr>
         <tr>
             <td>Введите Y:</td>
             <td>
-                <input class="y  inp" type="text" placeholder="От -3 до 5">
+                <select id="y_select">
+                    <option class="y inp" value="-4">-4</option>
+                    <option class="y inp" value="-3">-3</option>
+                    <option class="y inp" value="-2">-2</option>
+                    <option class="y inp" value="-1">-1</option>
+                    <option class="y inp" value="0">0</option>
+                    <option class="y inp" value="1">1</option>
+                    <option class="y inp" value="2">2</option>
+                    <option class="y inp" value="3">3</option>
+                    <option class="y inp" value="4">4</option>
+                </select>
                 <span class="error y"></span>
             </td>
         </tr>
         <tr>
             <td>Выберите R:</td>
             <td>
-                <button class="r button inp" value="1" type="button">1</button>
-                <button class="r button inp" value="1.5" type="button">1.5</button>
-                <button class="r button inp" value="2" type="button">2</button>
-                <button class="r button inp" value="2.5" type="button">2.5</button>
-                <button class="r button inp" value="3" type="button">3</button>
+                <input type="radio" class="r inp" id="r1" name="r inp" value="1">
+                <label for="r1">1</label>
+
+                <input type="radio" class="r inp" id="r2" name="r inp" value="2">
+                <label for="r2">2</label>
+
+                <input type="radio" class="r inp" id="r3" name="r inp" value="3">
+                <label for="r3">3</label>
+
+                <input type="radio" class="r inp" id="r4" name="r inp" value="4">
+                <label for="r4">4</label>
+
+                <input type="radio" class="r inp" id="r5" name="r inp" value="5">
+                <label for="r5">5</label>
+
                 <span class="error r"></span>
             </td>
         </tr>

@@ -3,6 +3,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+*.docx
+
 .idea
 connect_to_helios.sh
 send_file.sh

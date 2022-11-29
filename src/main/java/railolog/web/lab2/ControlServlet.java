@@ -14,10 +14,13 @@ public class ControlServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         request.setCharacterEncoding("UTF-8");
 
-        String param = request.getParameter("getTable");
+        String paramGetTable = request.getParameter("getTable");
+        String paramClearTable = request.getParameter("clearTable");
 
-        if (param != null && param.equals("true")) {
+        if (paramGetTable != null && paramGetTable.equals("true")) {
             request.getRequestDispatcher("table.jsp").forward(request, response);
+        } else if (paramClearTable != null && paramClearTable.equals("true")) {
+
         } else {
             request.getRequestDispatcher("form.jsp").forward(request, response);
         }

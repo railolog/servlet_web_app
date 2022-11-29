@@ -1,9 +1,7 @@
 var form = document.querySelector('.formWithValidation')
-var yVal = document.querySelector('.y')
-var xVal = null
+var yVal = document.querySelector('#y_select')
+var xVal = document.querySelector(".x.inp")
 var rVal = null
-var xBtns = document.querySelectorAll('.x')
-var rBtns = document.querySelectorAll('.r')
 var xError = document.querySelector('.error.x')
 var yError = document.querySelector('.error.y')
 var rError = document.querySelector('.error.r')
@@ -11,7 +9,7 @@ var table = document.querySelector('.results')
 var divRes = document.querySelector('div#result')
 var parser = new DOMParser();
 var canvas_graph = document.querySelector('canvas#graph');
-var y;
+var xFinal;
 
 
 let xhr = new XMLHttpRequest()
@@ -84,6 +82,7 @@ function draw_figures(ctx, w, h){
 
     ctx.fillRect(w/2, h/2, -w/6, -h/3)
 
+    ctx.beginPath();
     ctx.moveTo(w/2, h/2)
     ctx.lineTo(w/2, h/6)
     ctx.lineTo(w/6 * 4, h/2)
@@ -113,13 +112,14 @@ function draw_dot(e, x, y, r, hm){
 
 function draw(){
     var ctx = canvas_graph.getContext('2d');
+    ctx.clearRect(0, 0, canvas_graph.width, canvas_graph.height)
 
     draw_figures(ctx, canvas_graph.width, canvas_graph.height);
 
     ctx.fillStyle = `rgb(0, 0, 0)`
 
-    draw_dec_lines(ctx, canvas_graph.width, canvas_graph.height);
     draw_text(ctx, canvas_graph.width, canvas_graph.height);
+    draw_dec_lines(ctx, canvas_graph.width, canvas_graph.height);
 }
 
 draw()
@@ -160,6 +160,7 @@ xhr.onload = function() {
         })
     })*/
 
+    draw();
     document.querySelectorAll('tr.correct-dots').forEach(i => {
         var childs = Array.from(i.childNodes)
         console.log(childs[1].innerHTML, childs[3].innerHTML, childs[5].innerHTML, childs[7].innerHTML)
@@ -170,7 +171,7 @@ xhr.onload = function() {
 }
 
 xhr.onerror = function() {
-    alert('Запрос не удался')
+    alert('Failed to connect the server')
 }
 
 function updateClickedBtn(clickedBtn, others){
@@ -179,25 +180,26 @@ function updateClickedBtn(clickedBtn, others){
     clickedBtn.style.background = "red"
 }
 
-xBtns.forEach(b => b.addEventListener('click', function() {
-    updateClickedBtn(this, xBtns)
-}))
-
-xBtns.forEach(b => b.addEventListener('click', function() {
-    xVal = this.value
-}))
-
-rBtns.forEach(b => b.addEventListener('click', function() {
-    updateClickedBtn(this, rBtns)
-}))
-
-rBtns.forEach(b => b.addEventListener('click', function() {
-    rVal = this.value
-}))
-
 function valdateX(){
-    if (!xVal){
-        xError.textContent = 'Choose X value before checking!'
+    xFinal = xVal.value
+
+    if (xFinal.length == 0){
+        xError.textContent = 'Please, type a number'
+        return false
+    }
+
+    if (xFinal.length > 5){
+        xFinal = xFinal.substr(0, 5);
+    }
+
+    xFinal = Number(xFinal.replace(",", "."))
+
+    if (isNaN(xFinal)){
+        xError.textContent = 'Please, type a number'
+        return false
+    }
+    else if (xFinal < -3 || xFinal > 5){
+        xError.textContent = 'Enter Y value: Y is between -3 and 5'
         return false
     }
     else{
@@ -207,36 +209,11 @@ function valdateX(){
 }
 
 function valdateY(){
-    y = yVal.value
-
-    if (y.length == 0){
-        yError.textContent = 'Please, type a number'
-        return false
-    }
-
-    console.log(y.length)
-    if (y.length > 5){
-        y = y.substr(0, 5);
-    }
-    console.log(y.length)
-
-    y = Number(y.replace(",", "."))
-
-    if (isNaN(y)){
-        yError.textContent = 'Please, type a number'
-        return false
-    }
-    else if (y < -3 || y > 5){
-        yError.textContent = 'Enter Y value: Y is between -3 and 5'
-        return false
-    }
-    else{
-        yError.textContent = ''
-        return true
-    }
+    return true;
 }
 
 function valdateR(){
+    rVal = document.querySelector(".r.inp:checked")
     if (!rVal){
         rError.textContent = 'Choose R value before check'
         return false
@@ -247,17 +224,16 @@ function valdateR(){
     }
 }
 
-function sendRequestToPHP(){
-    console.log(xVal, y, rVal)
-    var params = 'x=' + encodeURIComponent(xVal) +
-        '&y=' + encodeURIComponent(y) +
-        '&r=' + encodeURIComponent(rVal) +
+function sendRequestToPHP(xToSend, yToSend){
+    console.log(xToSend, y, rVal)
+    var params = 'x=' + encodeURIComponent(xToSend) +
+        '&y=' + encodeURIComponent(yToSend) +
+        '&r=' + encodeURIComponent(rVal.value) +
         '&t=' + encodeURIComponent(new Date().getTimezoneOffset());
     xhr.open('POST', '/lab2', true)
 
     xhr.setRequestHeader("content-type","application/x-www-form-urlencoded")
 
-    var data = {x: xVal, y: y, r: rVal, t: new Date().getTimezoneOffset()}
     console.log(params)
 
     xhr.send(params)
@@ -272,6 +248,13 @@ function sendInitRequest(){
     xhr.send()
 }
 
+function sendClearRequest(){
+    var params = 'clearTable=' + encodeURIComponent('true');
+    xhr.open('GET', '/lab2?' + params, true);
+    xhr.setRequestHeader("content-type","application/x-www-form-urlencoded")
+    xhr.send()
+}
+
 canvas_graph.addEventListener('click', (e) => {
     c_offset = cumulativeOffset(canvas_graph);
 
@@ -279,18 +262,18 @@ canvas_graph.addEventListener('click', (e) => {
         var x = e.pageX - c_offset['left'];
         var yX = e.pageY - c_offset['top'];
 
-        xVal = Math.round((x - canvas_graph.width/2) / (105.5 / 1.5) * rVal * 1000) / 1000;
-        y = Math.round((canvas_graph.height/2 - yX) / (105.5 / 1.5) * rVal * 1000) / 1000;
+        x = Math.round((x - canvas_graph.width/2) / (105.5 / 1.5) * rVal.value * 1000) / 1000;
+        yX = Math.round((canvas_graph.height/2 - yX) / (105.5 / 1.5) * rVal.value * 1000) / 1000;
 
-        sendRequestToPHP();
+        sendRequestToPHP(x, yX);
     }
 })
 
 form.addEventListener('submit', function(event) {
     event.preventDefault()
-    if (valdateX() & valdateY() & valdateR()){
+    if (valdateX() && valdateY() && valdateR()){
         console.log('sent')
-        sendRequestToPHP()
+        sendRequestToPHP(xFinal, yVal.value)
     }
 })
 
